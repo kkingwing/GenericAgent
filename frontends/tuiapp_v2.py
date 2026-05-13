@@ -179,6 +179,7 @@ COMMANDS = [
     ("/new",      "[name]",           "新建并切换到新会话"),
     ("/switch",   "<id|name>",        "切换到指定会话"),
     ("/close",    "",                 "关闭当前会话"),
+    ("/rename",   "<name>",           "重命名当前会话"),
     ("/branch",   "[name]",           "从当前会话分支"),
     ("/rewind",   "[n]",              "回退最近 n 轮"),
     ("/clear",    "",                 "清空显示（不动 LLM 历史）"),
@@ -1134,6 +1135,7 @@ class GenericAgentTUI(App[None]):
             "new": self._cmd_new, "switch": self._cmd_switch, "close": self._cmd_close,
             "branch": self._cmd_branch, "rewind": self._cmd_rewind, "clear": self._cmd_clear,
             "stop": self._cmd_stop, "llm": self._cmd_llm, "export": self._cmd_export,
+            "rename": self._cmd_rename,
             "restore": self._cmd_restore,
             "btw": lambda a, r: self._cmd_btw(a, r),
             "continue": lambda a, r: self._cmd_continue(a, r),
@@ -1176,6 +1178,13 @@ class GenericAgentTUI(App[None]):
         self.current_id = target
         self._refresh_all()
         self._system(f"Switched to #{target}.")
+
+    def _cmd_rename(self, args):
+        if not args:
+            self._system("Usage: /rename <name>"); return
+        self.current.name = " ".join(args).strip()
+        self._refresh_all()
+        self._system(f"Renamed to {self.current.name!r}.")
 
     def _cmd_close(self, args):
         if len(self.sessions) <= 1:
